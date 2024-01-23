@@ -1,0 +1,6 @@
+usuario: 912034
+senha: AS142536
+
+Periodo de hoje - (quantos dias): 90
+
+Setor (Separador por ", "): LAVADORAS, QUEIMADORES, REFRIGERACAO 

@@ -1,0 +1,142 @@
+    select
+      DT_Cad,
+      HR_Cad,
+      Documento,
+      Filial_VV,
+      MicroZona,
+      Status,
+      Tp_Etg,
+      Plataforma,
+      Modal,
+      Sum(Qtd_Cxs) as Qtd_Cxs,
+      Sum(Valor_Ped) as Valor_Ped 
+      from (
+      --Venda Mercadoria Resumo Caixas e Valor
+        select
+          DT_Cad,
+          HR_Cad,
+          Documento,
+          Filial_VV,
+          Status,
+          MicroZona,
+          Tp_Etg,
+          Cod_Setor,
+          Dsc_Setor,
+          Plataforma,
+          Modal,
+          Sum(Qtd_Cxs) as Qtd_Cxs,
+          Sum(Valor_Ped) as Valor_Ped
+          from(
+              -- Venda Mercadoria
+              select a.dt_pvemcr_cad as DT_Cad, 
+              a.hr_pvemcr_cad as HR_Cad, 
+              Concat(a.cd_pvemcr,a.cd_pvemcr_dsm) as Documento, 
+              if(a.cd_fil_dpo_etg in(14,1200,1401), if( a.cd_fil_dpo_etg = 14,'1401'||' '||IF(a.cd_zen IN ('Y','Q','K','W'),'LEVES','PESADOS'),
+              a.cd_fil_dpo_etg||' '||IF(a.cd_zen IN ('Y','Q','K','W'),'LEVES','PESADOS')), 
+              a.cd_fil_dpo_etg) as Filial_VV, 
+              a.cd_fil_dpo_etg as Filial, 
+              a.st_pvemcr as Status_PV,
+              CASE 
+                WHEN a.ST_PVEMCR = 1 THEN 'ABERTO' 
+                WHEN a.ST_PVEMCR = 2 THEN 'ENCERRADO' 
+                WHEN a.ST_PVEMCR = 3 THEN 'CANCELADO' 
+                WHEN a.ST_PVEMCR = 4 THEN 'LIB. ENTREGA' 
+                WHEN a.ST_PVEMCR = 5 THEN 'EM ENTREGA' 
+                WHEN a.ST_PVEMCR = 6 THEN 'EM LOCALIZACAO' 
+                WHEN a.ST_PVEMCR = 7 THEN 'DESMEMBRADO' 
+                ELSE a.ST_PVEMCR END AS STATUS, 
+                a.cd_tipetg as Tp_Etg, 
+                b.cd_mcr as sku, c.ds_mcr as descricao,
+                c.cd_setmcr as Cod_Setor, 
+              CASE 
+                WHEN c.cd_setmcr = 1 THEN  'ALIMENTOS' 
+                WHEN c.cd_setmcr = 4 THEN  'BEBIDAS' 
+                WHEN c.cd_setmcr = 5 THEN  'CASA E CONSTRUCAO' 
+                WHEN c.cd_setmcr = 6 THEN  'GAMES' 
+                WHEN c.cd_setmcr = 9 THEN  'AUTOMOTIVOS'
+                WHEN c.cd_setmcr = 10 THEN 'TELEFONIA CELULAR' 
+                WHEN c.cd_setmcr = 11 THEN 'AUDIO' 
+                WHEN c.cd_setmcr = 13 THEN 'TVS'
+                WHEN c.cd_setmcr = 14 THEN 'DRONES, CAMERAS E FILMADORAS' 
+                WHEN c.cd_setmcr = 15 THEN 'RELOGIOS' 
+                WHEN c.cd_setmcr = 16 THEN 'BICICLETAS' 
+                WHEN c.cd_setmcr = 17 THEN 'ESPORTE' 
+                WHEN c.cd_setmcr = 18 THEN 'BRINQUEDOS/PEDAL'
+                WHEN c.cd_setmcr = 19 THEN 'INSTRUMENTOS MUSICAIS'
+                WHEN c.cd_setmcr = 20 THEN 'LIVROS' 
+                WHEN c.cd_setmcr = 21 THEN 'PORTATEIS'
+                WHEN c.cd_setmcr = 22 THEN 'INOX/ALUMINIO/ETC'
+                WHEN c.cd_setmcr = 24 THEN 'MAQUINA DE COSTURA'
+                WHEN c.cd_setmcr = 25 THEN 'QUEIMADORES' 
+                WHEN c.cd_setmcr = 26 THEN 'REFRIGERACAO' 
+                WHEN c.cd_setmcr = 27 THEN 'LAVADORAS' 
+                WHEN c.cd_setmcr = 28 THEN 'VENTILACAO' 
+                WHEN c.cd_setmcr = 29 THEN 'AR' 
+                WHEN c.cd_setmcr = 30 THEN 'MOVEIS PLANEJADOS' 
+                WHEN c.cd_setmcr = 31 THEN 'MOVEIS DE COPA E COZINHA' 
+                WHEN c.cd_setmcr = 32 THEN 'MOVEIS DE QUARTO'
+                WHEN c.cd_setmcr = 33 THEN 'ESTOFADOS' 
+                WHEN c.cd_setmcr = 34 THEN 'COLCHOES' 
+                WHEN c.cd_setmcr = 35 THEN 'TAPECARIA' 
+                WHEN c.cd_setmcr = 36 THEN 'MOVEIS INFANTIS' 
+                WHEN c.cd_setmcr = 37 THEN 'COMPLEMENTO INFANTIL' 
+                WHEN c.cd_setmcr = 38 THEN 'MOVEIS DE SALA DE JANTAR'
+                WHEN c.cd_setmcr = 39 THEN 'MOVEIS SALA DE ESTAR'
+                WHEN c.cd_setmcr = 40 THEN 'INFORMATICA' 
+                WHEN c.cd_setmcr = 41 THEN 'PAPELARIA E MAT.ESCRITORIO' 
+                WHEN c.cd_setmcr = 42 THEN 'FERRAMENTAS' 
+                WHEN c.cd_setmcr = 43 THEN 'ACESSORIOS E INOVACOES'
+                WHEN c.cd_setmcr = 44 THEN 'DECORACOES' 
+                WHEN c.cd_setmcr = 45 THEN 'BEBES' 
+                WHEN c.cd_setmcr = 46 THEN 'BELEZA & SAUDE' 
+                WHEN c.cd_setmcr = 47 THEN 'AGRO, INDUSTRIA E COMERCIO'
+                WHEN c.cd_setmcr = 49 THEN 'TELEFONIA FIXA' 
+                WHEN c.cd_setmcr = 50 THEN 'PRODUTOS DE LIMPEZA'
+                WHEN c.cd_setmcr = 51 THEN 'TABLETS'
+                WHEN c.cd_setmcr = 52 THEN 'PET' 
+                WHEN c.cd_setmcr = 53 THEN 'MODA BEBE / INFANTIL' 
+                WHEN c.cd_setmcr = 54 THEN 'MODA MASCULINA' 
+                WHEN c.cd_setmcr = 55 THEN 'MODA FEMININA'
+                WHEN c.cd_setmcr = 56 THEN 'CAMA/MESA/BANHO'
+                WHEN c.cd_setmcr = 57 THEN 'CALCADOS INFANTIS'
+                WHEN c.cd_setmcr = 58 THEN 'CALCADOS FEMININOS' 
+                WHEN c.cd_setmcr = 59 THEN 'MALAS / MOCHILAS / ACESSORIOS' 
+                WHEN c.cd_setmcr = 60 THEN 'PERFUMARIA E COSMETICOS'
+                WHEN c.cd_setmcr = 61 THEN 'DVD FILMES E CDS MUSICAIS' 
+                WHEN c.cd_setmcr = 62 THEN 'DISNEY SUPER LOJA' 
+                WHEN c.cd_setmcr = 63 THEN 'MOVEIS OCASIONAIS' 
+                WHEN c.cd_setmcr = 64 THEN 'MOVEIS PARA ESCRITORIO' 
+                WHEN c.cd_setmcr = 65 THEN 'CALCADOS MASCULINOS'
+                WHEN c.cd_setmcr = 66 THEN 'SUPLEMENTOS' 
+                WHEN c.cd_setmcr = 67 THEN 'VISTA VIA' 
+                WHEN c.cd_setmcr = 68 THEN 'CARTAO PRESENTE'
+                ELSE 'NOVO SETOR' END AS Dsc_Setor,
+                a.cd_fil_pto_vnd as Pto_Vnd,
+                CONCAT(a.cd_est_sig_zen, a.cd_zen, 
+                right(CONCAT('000',a.cd_miczen),4)) as MicroZona, 
+                a.cd_pvemcr_est_etg as UF_Cliente, 
+                if(a.cd_fil_pto_vnd > 5000,'ON','OFF') as Plataforma, 
+                IF(a.cd_zen IN ('Y','Q','K','W'),'LEVES','PESADOS') as Modal, 
+                b.qt_ipmcr_mcr as Qtd_Cxs, 
+                b.vr_ipmcr_unt as Valor, 
+                b.qt_ipmcr_mcr * b.vr_ipmcr_unt as Valor_Ped
+            from context_loja.pve_mcr as a
+            left join context_loja.itm_pve_mcr as b
+            ON left(a.cd_pvemcr,9) = b.cd_pvemcr
+            left join context_loja.mcr as c 
+            ON b.cd_mcr = c.cd_mcr
+            --where do agrupamento (1)
+            where
+            a.dt_pvemcr_cad >= '2022-05-05'
+            --(a.dt_pvemcr_cad >= '2021-01-01' and a.dt_pvemcr_cad < '2021-04-01')
+            --and c.cd_setmcr != ""
+            and a.st_pvemcr != 7
+            and a.cd_tipetg = 'SD'
+           -- and a.cd_fil_dpo_etg = 1200
+            ) -- Fim resumo Caixas e Valor
+            where Dsc_Setor != "NOVO SETOR"
+        group by DT_Cad, HR_Cad, Documento, Filial_VV, MicroZona, Status, Tp_Etg, Cod_Setor, Dsc_Setor, Plataforma, Modal
+        order by DT_Cad, HR_Cad, Documento, Filial_VV, MicroZona, Status, Tp_Etg, Cod_Setor, Dsc_Setor, Plataforma, Modal
+      )-- Fim Resumo Pedido
+    group by DT_Cad, HR_Cad, Documento, Filial_VV, MicroZona, Status, Tp_Etg, Plataforma, Modal
+    order by DT_Cad, HR_Cad, Documento, Filial_VV, MicroZona, Status, Tp_Etg, Plataforma, Modal
